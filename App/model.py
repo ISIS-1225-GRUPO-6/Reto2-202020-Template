@@ -35,20 +35,66 @@ es decir contiene los modelos con los datos en memoria
 # API del TAD Catalogo de Libros
 # -----------------------------------------------------
 
+def newCatalog():
+    """ Inicializa el catálogo de libros
 
+    Crea una lista vacia para guardar todos los libros
 
-# Funciones para agregar informacion al catalogo
+    Se crean indices (Maps) por los siguientes criterios:
+    Autores
+    ID libros
+    Tags
+    Año de publicacion
 
+    Retorna el catalogo inicializado.
+    """
+    catalog = {'movies': None,
+               'moviesIds': None,}
 
+    catalog['movies'] = lt.newList('SINGLE_LINKED', comparaIds)
+    catalog['moviesIds'] = mp.newMap(2011,
+                                   maptype='PROBING',
+                                   loadfactor=0.4,
+                                   comparefunction=comparaMapMoviesIds)
+    return catalog
+# ___________________________________________________
+#  Funciones para la carga de datos y almacenamiento
+#  de datos en los modelos
+# ___________________________________________________
+def addmovie(catalog, movie):
+    """
+    Esta funcion adiciona un libro a la lista de libros,
+    adicionalmente lo guarda en un Map usando como llave su Id.
+    Finalmente crea una entrada en el Map de años, para indicar que este
+    libro fue publicaco en ese año.
+    """
+    lt.addLast(catalog['movies'], movie)
+    mp.put(catalog['moviesIds'], movie['id'], movie)
 
-# ==============================
-# Funciones de consulta
-# ==============================
+def comparaIds (id, record):
 
+    if int (id)== int (record['id']):
+        return 0
+    elif int (id) > int (record['id']):
+        return 1
+    return -1
 
+def comparaMapMoviesIds(id, entry):
+    """
+    Compara dos ids de libros, id es un identificador
+    y entry una pareja llave-valor
+    """
+    identry = me.getKey(entry)
+    if (int(id) == int(identry)):
+        return 0
+    elif (int(id) > int(identry)):
+        return 1
+    else:
+        return -1
 
-# ==============================
-# Funciones de Comparacion
-# ==============================
-
+def moviesSize(catalog):
+    """
+    Número de libros en el catago
+    """
+    return lt.size(catalog['movies'])
 

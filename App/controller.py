@@ -23,7 +23,7 @@
 import config as cf
 from App import model
 import csv
-
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -38,9 +38,40 @@ recae sobre el controlador.
 # ___________________________________________________
 
 
+def initCatalog():
+    """
+    Llama la funcion de inicializacion del catalogo del modelo.
+    """
+    # catalog es utilizado para interactuar con el modelo
+    catalog = model.newCatalog()
+    
+    return catalog
 
+def loadData(catalog,moviesfile):
+    """
+    Carga los datos de los archivos en el modelo
+    """
+    loadmovies(catalog, moviesfile)
+    
 
-# ___________________________________________________
-#  Funciones para la carga de datos y almacenamiento
-#  de datos en los modelos
-# ___________________________________________________
+def loadmovies(catalog, moviesfile):
+    """
+    Carga cada una de las lineas del archivo de libros.
+    - Se agrega cada pelcula al catalogo de peliculas
+    - Por cada libro se encuentran sus autores y por cada
+      autor, se crea una lista con sus libros
+    """
+    moviesfile = cf.data_dir + moviesfile
+    input_file = csv.DictReader(open(moviesfile, encoding="utf8"))
+    for movie in input_file:
+        model.addmovie(catalog, movie)
+
+        #ids = movie['id'].split(",")  # Se obtienen los autores
+
+        """for author in authors:
+            model.addBookAuthor(catalog, author.strip(), book)"""
+
+def moviesSize(catalog):
+    """Numero de libros leido
+    """
+    return model.moviesSize(catalog)

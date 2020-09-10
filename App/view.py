@@ -33,11 +33,12 @@ Presenta el menu de opciones y por cada seleccion
 hace la solicitud al controlador para ejecutar la
 operación seleccionada.
 """
+moviesfile = 'SmallMoviesDetailsCleaned.csv'
+castingfile = 'MoviesCastingRaw-small.csv'
 
 # ___________________________________________________
 #  Ruta a los archivos
 # ___________________________________________________
-
 
 
 
@@ -47,6 +48,38 @@ operación seleccionada.
 #  respuesta.  La vista solo interactua con
 #  el controlador.
 # ___________________________________________________
+
+# ___________________________________________________
+#  Menu principal
+# ___________________________________________________
+
+
+def printMenu():
+    print("Bienvenido")
+    print("1- Inicializar Catálogo")
+    print("2- Cargar información en el catálogo")
+    print("0- Salir")
+
+
+"""
+Menu principal
+"""
+while True:
+    printMenu()
+    inputs = input('Seleccione una opción para continuar\n')
+
+    if int(inputs[0]) == 1:
+        print("Inicializando Catálogo ....")
+        # cont es el controlador que se usará de acá en adelante
+        cont = controller.initCatalog()
+
+    elif int(inputs[0]) == 2:
+        print("Cargando información de los archivos ....")
+        controller.loadData(cont, moviesfile)
+        print('Peliculas cargadas: '+str(controller.moviesSize(cont)))
+    else:
+        sys.exit(0)
+sys.exit(0)
 
 
 
