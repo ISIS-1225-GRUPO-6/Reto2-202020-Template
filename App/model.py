@@ -69,7 +69,8 @@ def addmovie(catalog, movie):
     libro fue publicaco en ese año.
     """
     lt.addLast(catalog['movies'], movie)
-    mp.put(catalog['moviesIds'], movie['id'], movie)
+    #print(movie)
+    #mp.put(catalog['moviesIds'], movie['id'], movie)
 
 def comparaIds (id, record):
 
