@@ -26,6 +26,9 @@ from DISClib.ADT import list as lt
 from DISClib.DataStructures import listiterator as it
 from App import controller
 assert config
+import csv
+from ADT import list as lt
+
 
 """
 La vista se encarga de la interacción con el usuario.
@@ -53,3 +56,35 @@ operación seleccionada.
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
+
+def printMenu():
+    """
+    Imprime el menu de opciones
+    """
+    print("\nBienvenido")
+    print("1- Cargar Datos")
+    print("0- Salir")
+
+def main():
+    """
+    Método principal del programa, se encarga de manejar todos los metodos adicionales creados
+
+    Instancia una lista vacia en la cual se guardarán los datos cargados desde el archivo
+    Args: None
+    Return: None 
+    """
+    
+    while True:
+        printMenu() #imprimir el menu de opciones en consola
+        inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
+        if len(inputs)>0:
+            if int(inputs[0])==1: #opcion 1
+                print("Cargando archivos ....")              
+                Movies= controller.loadMovies()  
+                controller.Aimprimir(Movies)
+                
+            elif int(inputs[0])==0: #opcion 0, salir
+                sys.exit(0)
+                
+if __name__ == "__main__":
+    main()

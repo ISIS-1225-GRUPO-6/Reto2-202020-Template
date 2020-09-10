@@ -23,6 +23,7 @@
 import config as cf
 from App import model
 import csv
+from ADT import list as lt
 
 
 """
@@ -32,124 +33,58 @@ el modelo varias veces o integrar varias de las respuestas
 del modelo en una sola respuesta. Esta responsabilidad
 recae sobre el controlador.
 """
-
-def initCatalog():
+def loadCSVFile (file,cmpfunction):
     """
-    Llama la funcion de inicializacion del catalogo del modelo.
+    Carga un archivo csv a una lista
+    Args:
+        file
+            Archivo csv del cual se importaran los datos
+        sep = ";"
+            Separador utilizado para determinar cada objeto dentro del archivo
+        Try:
+        Intenta cargar el archivo CSV a la lista que se le pasa por parametro, si encuentra algun error
+        Borra la lista e informa al usuario
+    Returns: None  
     """
-    # catalog es utilizado para interactuar con el modelo
-    catalog = model.newCatalog()
-    return catalog
+    sep=";"
+    lst = lt.newList("ARRAY_LIST",cmpfunction) #Usando implementacion arraylist
+    #lst = lt.newList("SINGLE_LINKED",cmpfuntion) #Usando implementacion linkedlist   
+    dialect = csv.excel()
+    dialect.delimiter=sep
+    try:
+        with open(file, encoding="utf-8") as csvfile:
+            spamreader = csv.DictReader(csvfile, dialect=dialect)
+            for row in spamreader: 
+                lt.addLast(lst,row)
+    except:
+        print("Hubo un error con la carga del archivo")
+    
+    return lst
 
+def loadMovies():
+    lst=loadCSVFile("Data/SmallMoviesDetailsCleaned.csv",comparaIds)
+    print("Datos cargados, ",lst['size']," elementos cargados")
+    return lst
+def Aimprimir(lst):
+    #print(lt.getElement(lst,1))
+    listam=lt.newList('ARRAY_LIST',comparaIds)
+    for i in range(lst['size']):
+        elemento= lt.getElement(lst,i)
+        titulo=(elemento['original_title'])
+        fecha=(elemento['release_date'])
+        prom=(elemento['vote_average'])
+        votes=(elemento['vote_count'])
+        lenguaje=(elemento['original_language'])
+        agregar={'original_title': titulo,'release_date': fecha,'vote_average': prom,'vote_count': votes, 'original_language': lenguaje}
+        lt.addLast(listam,agregar)
+    elemento1=lt.getElement(listam,2)
+    elemento2=lt.getElement(listam,1)
+    print(elemento1['original_title']+", "+elemento1['release_date']+", "+elemento1['vote_average']+", "+elemento1['vote_count']+", "+elemento1['original_language'])
+    print(elemento2['original_title']+", "+elemento2['release_date']+", "+elemento2['vote_average']+", "+elemento2['vote_count']+", "+elemento2['original_language']) 
 
-# ___________________________________________________
-#  Funciones para la carga de datos y almacenamiento
-#  de datos en los modelos
-# ___________________________________________________
-
-def loadData(catalog, booksfile, tagsfile, booktagsfile):
-    """
-    Carga los datos de los archivos en el modelo
-    """
-    loadBooks(catalog, booksfile)
-    loadTags(catalog, tagsfile)
-    loadBooksTags(catalog, booktagsfile)
-
-
-def loadBooks(catalog, booksfile):
-    """
-    Carga cada una de las lineas del archivo de libros.
-    - Se agrega cada libro al catalogo de libros
-    - Por cada libro se encuentran sus autores y por cada
-      autor, se crea una lista con sus libros
-    """
-    booksfile = cf.data_dir + booksfile
-    input_file = csv.DictReader(open(booksfile))
-    for book in input_file:
-        model.addBook(catalog, book)
-        authors = book['authors'].split(",")  # Se obtienen los autores
-        for author in authors:
-            model.addBookAuthor(catalog, author.strip(), book)
-
-
-def loadTags(catalog, tagsfile):
-    """
-    Carga en el catalogo los tags a partir de la informacion
-    del archivo de etiquetas
-    """
-    tagsfile = cf.data_dir + tagsfile
-    input_file = csv.DictReader(open(tagsfile))
-    for tag in input_file:
-        model.addTag(catalog, tag)
-
-
-def loadBooksTags(catalog, booktagsfile):
-    """
-    Carga la información que asocia tags con libros.
-    Primero se localiza el tag y se le agrega la información leida.
-    Adicionalmente se le agrega una referencia al libro procesado.
-    """
-    booktagsfile = cf.data_dir + booktagsfile
-    input_file = csv.DictReader(open(booktagsfile))
-    for tag in input_file:
-        model.addBookTag(catalog, tag)
-
-
-# ___________________________________________________
-#  Funciones para consultas
-# ___________________________________________________
-
-def booksSize(catalog):
-    """Numero de libros leido
-    """
-    return model.booksSize(catalog)
-
-
-def authorsSize(catalog):
-    """Numero de autores leido
-    """
-    return model.authorsSize(catalog)
-
-
-def tagsSize(catalog):
-    """Numero de tags leido
-    """
-    return model.tagsSize(catalog)
-
-
-def getBooksByAuthor(catalog, authorname):
-    """
-    Retorna los libros de un autor
-    """
-    authorinfo = model.getBooksByAuthor(catalog, authorname)
-    return authorinfo
-
-
-def getBooksByTag(catalog, tagname):
-    """
-    Retorna los libros que han sido marcados con
-    una etiqueta
-    """
-    books = model.getBooksByTag(catalog, tagname)
-    return books
-
-
-def getBooksYear(catalog, year):
-    """
-    Retorna los libros que fueron publicados
-    en un año
-    """
-    books = model.getBooksByYear(catalog, year)
-    return books
-
-# ___________________________________________________
-#  Inicializacion del catalogo
-# ___________________________________________________
-
-
-
-
-# ___________________________________________________
-#  Funciones para la carga de datos y almacenamiento
-#  de datos en los modelos
-# ___________________________________________________
+def comparaIds (id, record):
+    if int (id)== int (record['id']):
+        return 0
+    elif int (id) > int (record['id']):
+        return 1
+    return -1
