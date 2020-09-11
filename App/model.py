@@ -70,7 +70,7 @@ def addmovie(catalog, movie):
     """
     lt.addLast(catalog['movies'], movie)
     #print(movie)
-    #mp.put(catalog['moviesIds'], movie['id'], movie)
+    mp.put(catalog['moviesIds'], movie['id'], movie)
 
 def comparaIds (id, record):
 

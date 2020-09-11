@@ -62,9 +62,14 @@ def loadmovies(catalog, moviesfile):
       autor, se crea una lista con sus libros
     """
     moviesfile = cf.data_dir + moviesfile
-    input_file = csv.DictReader(open(moviesfile, encoding="utf8"))
-    for movie in input_file:
-        model.addmovie(catalog, movie)
+    sep=";"  
+    dialect = csv.excel()
+    dialect.delimiter=sep
+    
+    with open(moviesfile, encoding="utf-8") as csvfile:
+        input_file = csv.DictReader(csvfile, dialect=dialect)
+        for movie in input_file:
+            model.addmovie(catalog, movie)
 
         #ids = movie['id'].split(",")  # Se obtienen los autores
 
