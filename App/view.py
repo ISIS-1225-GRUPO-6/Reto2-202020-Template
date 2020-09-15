@@ -93,6 +93,21 @@ while True:
         company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
         compa_info = controller.getmoviesbycomp(cont, company_name)
         imprime_companias(compa_info)
+
+    elif int(inputs[0]) == 4:
+        print()
+
+    elif int(inputs[0]) == 5:
+        print()
+                    
+    elif int(inputs[0]) == 6:
+        print()
+                
+    elif int(inputs[0]) == 7:
+        print()
+            
+    elif int(inputs[0]) == 8:
+        print()
     else:
         sys.exit(0)
 sys.exit(0)

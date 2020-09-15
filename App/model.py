@@ -50,17 +50,38 @@ def newCatalog():
     """
     catalog = {'movies': None,
                'moviesIds': None,
-               'moviesComp': None}
-
+               'actors': None,
+                'directors': None,
+               'moviesComp': None,
+               'genres': None,
+                'countries': None}
+    lfactor=0.4
+    tamaño=2011
     catalog['movies'] = lt.newList('SINGLE_LINKED', comparaIds)
-    catalog['moviesIds'] = mp.newMap(2011,
+    catalog['moviesIds'] = mp.newMap(tamaño,
                                    maptype='PROBING',
-                                   loadfactor=0.4,
+                                   loadfactor=lfactor,
                                    comparefunction=comparaMapMoviesIds)
-    catalog['moviesComp'] = mp.newMap(2011,
+    catalog['moviesComp'] = mp.newMap(tamaño,
                                    maptype='PROBING',
-                                   loadfactor=0.4,
+                                   loadfactor=lfactor,
                                    comparefunction=compareComp)
+    catalog['directors'] = mp.newMap(tamaño,
+                                   maptype='CHAINING',
+                                   loadfactor=lfactor,
+                                   comparefunction=compareDirectorsByName)
+    catalog['actors'] = mp.newMap(tamaño,
+                                  maptype='CHAINING',
+                                  loadfactor=lfactor,
+                                  comparefunction=compareActorsByName)
+    catalog['genres'] = mp.newMap(tamaño,
+                                 maptype='CHAINING',
+                                 loadfactor=lfactor,
+                                 comparefunction=compareGenres)
+    catalog['countries'] = mp.newMap(tamaño,
+                                 maptype='CHAINING',
+                                 loadfactor=lfactor,
+                                 comparefunction=compareCountry)
     return catalog
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
@@ -158,3 +179,36 @@ def moviesSize(catalog):
     """
     return lt.size(catalog['movies'])
 
+def compareDirectorsByName(director, entry):
+    directorentry = me.getKey(entry)
+    if (director == directorentry):
+        return 0
+    elif (director > directorentry):
+        return 1
+    else:
+        return -1
+def compareActorsByName(name, entry):
+    nameentry = me.getKey(entry)
+    if (name == nameentry):
+        return 0
+    elif (name > nameentry):
+        return 1
+    else:
+        return -1
+def compareGenres(genre, entry):
+    genreentry = me.getKey(entry)
+    if (genre == genreentry):
+        return 0
+    elif (genre > genreentry):
+        return 1
+    else:
+        return 0 
+
+def compareCountry(country, entry):
+    countryentry = me.getKey(entry)
+    if (country == countryentry):
+        return 0
+    elif (country > countryentry):
+        return 1
+    else:
+        return 0 
