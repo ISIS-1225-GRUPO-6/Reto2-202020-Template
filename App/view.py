@@ -52,12 +52,23 @@ castingfile = 'MoviesCastingRaw-small.csv'
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
-
+def imprime_companias(compa_info):
+    if compa_info:
+        print('Compañia encontrada: ' + compa_info['comp'])
+        print('Promedio: ' + str(compa_info['vote_average']))
+        print('Total de peliculas: ' + str(lt.size(compa_info['movies'])))
+        iterator = it.newIterator(compa_info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+    else:
+        print('No se encontro la compañia')
 
 def printMenu():
     print("Bienvenido")
     print("1- Inicializar Catálogo")
     print("2- Cargar información en el catálogo")
+    print("3- Películas que pertenecen a una compañía de producción")
     print("0- Salir")
 
 
@@ -77,6 +88,11 @@ while True:
         print("Cargando información de los archivos ....")
         controller.loadData(cont, moviesfile)
         print('Peliculas cargadas: '+str(controller.moviesSize(cont)))
+        
+    elif int(inputs[0]) == 3:
+        company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
+        compa_info = controller.getmoviesbycomp(cont, company_name)
+        imprime_companias(compa_info)
     else:
         sys.exit(0)
 sys.exit(0)

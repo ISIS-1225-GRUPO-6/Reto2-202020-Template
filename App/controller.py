@@ -70,11 +70,15 @@ def loadmovies(catalog, moviesfile):
         input_file = csv.DictReader(csvfile, dialect=dialect)
         for movie in input_file:
             model.addmovie(catalog, movie)
+            compas = movie['production_companies'].split(",")  # Se obtienen los autores
+            for compa in compas:
+                model.addComp(catalog, compa.strip(), movie)
 
-        #ids = movie['id'].split(",")  # Se obtienen los autores
+            
 
-        """for author in authors:
-            model.addBookAuthor(catalog, author.strip(), book)"""
+def getmoviesbycomp (catalog, company_name):
+    compinfo = model.getmoviesbycomp(catalog, company_name)
+    return compinfo
 
 def moviesSize(catalog):
     """Numero de libros leido

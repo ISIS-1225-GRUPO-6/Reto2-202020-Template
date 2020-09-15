@@ -56,6 +56,10 @@ def newCatalog():
                                    maptype='PROBING',
                                    loadfactor=0.4,
                                    comparefunction=comparaMapMoviesIds)
+    catalog['moviesComp'] = mp.newMap(2011,
+                                   maptype='PROBING',
+                                   loadfactor=0.4,
+                                   comparefunction=compareComp)
     return catalog
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
@@ -71,6 +75,51 @@ def addmovie(catalog, movie):
     lt.addLast(catalog['movies'], movie)
     #print(movie)
     mp.put(catalog['moviesIds'], movie['id'], movie)
+    
+
+def addComp(catalog, company_name, movie):
+    """
+    Esta funcion adiciona un libro a la lista de libros que
+    fueron publicados en un año especifico.
+    Los años se guardan en un Map, donde la llave es el año
+    y el valor la lista de libros de ese año.
+    """
+    companias = catalog['moviesComp']
+    existcomp = mp.contains(companias, company_name)
+    if existcomp:
+        entry = mp.get(companias, company_name)
+        comp = me.getValue(entry)
+    else:
+        comp = newCompania(company_name)
+        mp.put(companias, company_name, comp)
+    lt.addLast(comp['movies'], movie)
+
+    compaverage = comp['vote_average']
+    movieaverage = movie['vote_average']
+    if (compaverage == 0.0):
+        comp['vote_average'] = float(movieaverage)
+    else:
+        comp['vote_average'] = (compaverage + float(movieaverage)) / 2
+
+
+def newCompania(company_product):
+    """
+    Esta funcion crea la estructura de libros asociados
+    a un año.
+    """
+    entry = {'comp': "", "movies": None, "vote_average": 0}
+    entry['comp'] = company_product
+    entry['movies'] = lt.newList('SINGLE_LINKED', compareComp)
+    return entry
+
+def getmoviesbycomp(catalog, company_name):
+    """
+    Retorna un autor con sus libros a partir del nombre del autor
+    """
+    company_name = mp.get(catalog['moviesComp'], company_name)
+    if company_name:
+        return me.getValue(company_name)
+    return None
 
 def comparaIds (id, record):
 
@@ -89,6 +138,15 @@ def comparaMapMoviesIds(id, entry):
     if (int(id) == int(identry)):
         return 0
     elif (int(id) > int(identry)):
+        return 1
+    else:
+        return -1
+
+def compareComp(Comp, entry):
+    cpentry = me.getKey(entry)
+    if (str(Comp) == str(cpentry)):
+        return 0
+    elif (str(Comp) > str(cpentry)):
         return 1
     else:
         return -1
