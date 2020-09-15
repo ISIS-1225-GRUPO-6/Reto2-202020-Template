@@ -48,10 +48,6 @@ castingfile = 'MoviesCastingRaw-small.csv'
 #  respuesta.  La vista solo interactua con
 #  el controlador.
 # ___________________________________________________
-
-# ___________________________________________________
-#  Menu principal
-# ___________________________________________________
 def imprime_companias(compa_info):
     if compa_info:
         print('Compañia encontrada: ' + compa_info['comp'])
@@ -111,9 +107,3 @@ while True:
     else:
         sys.exit(0)
 sys.exit(0)
-
-
-
-# ___________________________________________________
-#  Menu principal
-# ___________________________________________________

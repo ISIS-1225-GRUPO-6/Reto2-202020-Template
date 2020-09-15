@@ -95,7 +95,6 @@ def addmovie(catalog, movie):
     libro fue publicaco en ese año.
     """
     lt.addLast(catalog['movies'], movie)
-    #print(movie)
     mp.put(catalog['moviesIds'], movie['id'], movie)
     
 
