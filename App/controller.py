@@ -23,7 +23,7 @@
 import config as cf
 from App import model
 import csv
-
+from DISClib.ADT import list as lt
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -147,9 +147,49 @@ def getBooksYear(catalog, year):
 # ___________________________________________________
 
 
+def initCatalog():
+    """
+    Llama la funcion de inicializacion del catalogo del modelo.
+    """
+    # catalog es utilizado para interactuar con el modelo
+    catalog = model.newCatalog()
+    
+    return catalog
 
+def loadData(catalog,moviesfile):
+    """
+    Carga los datos de los archivos en el modelo
+    """
+    loadmovies(catalog, moviesfile)
+    
 
-# ___________________________________________________
-#  Funciones para la carga de datos y almacenamiento
-#  de datos en los modelos
-# ___________________________________________________
+def loadmovies(catalog, moviesfile):
+    """
+    Carga cada una de las lineas del archivo de libros.
+    - Se agrega cada pelcula al catalogo de peliculas
+    - Por cada libro se encuentran sus autores y por cada
+      autor, se crea una lista con sus libros
+    """
+    moviesfile = cf.data_dir + moviesfile
+    sep=";"  
+    dialect = csv.excel()
+    dialect.delimiter=sep
+    
+    with open(moviesfile, encoding="utf-8") as csvfile:
+        input_file = csv.DictReader(csvfile, dialect=dialect)
+        for movie in input_file:
+            model.addmovie(catalog, movie)
+            compas = movie['production_companies'].split(",")  # Se obtienen los autores
+            for compa in compas:
+                model.addComp(catalog, compa.strip(), movie)
+
+            
+
+def getmoviesbycomp (catalog, company_name):
+    compinfo = model.getmoviesbycomp(catalog, company_name)
+    return compinfo
+
+def moviesSize(catalog):
+    """Numero de libros leido
+    """
+    return model.moviesSize(catalog)

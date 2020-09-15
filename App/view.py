@@ -33,11 +33,12 @@ Presenta el menu de opciones y por cada seleccion
 hace la solicitud al controlador para ejecutar la
 operación seleccionada.
 """
+moviesfile = 'SmallMoviesDetailsCleaned.csv'
+castingfile = 'MoviesCastingRaw-small.csv'
 
 # ___________________________________________________
 #  Ruta a los archivos
 # ___________________________________________________
-
 
 
 
@@ -47,6 +48,69 @@ operación seleccionada.
 #  respuesta.  La vista solo interactua con
 #  el controlador.
 # ___________________________________________________
+
+# ___________________________________________________
+#  Menu principal
+# ___________________________________________________
+def imprime_companias(compa_info):
+    if compa_info:
+        print('Compañia encontrada: ' + compa_info['comp'])
+        print('Promedio: ' + str(compa_info['vote_average']))
+        print('Total de peliculas: ' + str(lt.size(compa_info['movies'])))
+        iterator = it.newIterator(compa_info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+    else:
+        print('No se encontro la compañia')
+
+def printMenu():
+    print("Bienvenido")
+    print("1- Inicializar Catálogo")
+    print("2- Cargar información en el catálogo")
+    print("3- Películas que pertenecen a una compañía de producción")
+    print("0- Salir")
+
+
+"""
+Menu principal
+"""
+while True:
+    printMenu()
+    inputs = input('Seleccione una opción para continuar\n')
+
+    if int(inputs[0]) == 1:
+        print("Inicializando Catálogo ....")
+        # cont es el controlador que se usará de acá en adelante
+        cont = controller.initCatalog()
+
+    elif int(inputs[0]) == 2:
+        print("Cargando información de los archivos ....")
+        controller.loadData(cont, moviesfile)
+        print('Peliculas cargadas: '+str(controller.moviesSize(cont)))
+        
+    elif int(inputs[0]) == 3:
+        company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
+        compa_info = controller.getmoviesbycomp(cont, company_name)
+        imprime_companias(compa_info)
+
+    elif int(inputs[0]) == 4:
+        print()
+
+    elif int(inputs[0]) == 5:
+        print()
+                    
+    elif int(inputs[0]) == 6:
+        print()
+                
+    elif int(inputs[0]) == 7:
+        print()
+            
+    elif int(inputs[0]) == 8:
+        print()
+    else:
+        sys.exit(0)
+sys.exit(0)
 
 
 
