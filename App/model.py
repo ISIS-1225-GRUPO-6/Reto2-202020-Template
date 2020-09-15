@@ -49,7 +49,8 @@ def newCatalog():
     Retorna el catalogo inicializado.
     """
     catalog = {'movies': None,
-               'moviesIds': None,}
+               'moviesIds': None,
+               'moviesComp': None}
 
     catalog['movies'] = lt.newList('SINGLE_LINKED', comparaIds)
     catalog['moviesIds'] = mp.newMap(2011,
