@@ -26,6 +26,9 @@ from DISClib.ADT import list as lt
 from DISClib.DataStructures import listiterator as it
 from App import controller
 assert config
+import csv
+from ADT import list as lt
+
 
 """
 La vista se encarga de la interacción con el usuario.
