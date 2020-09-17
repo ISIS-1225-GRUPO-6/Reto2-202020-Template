@@ -88,17 +88,14 @@ def newCatalog():
 #  de datos en los modelos
 # ___________________________________________________
 def addmovie(catalog, movie):
-    """
-    Esta funcion adiciona un libro a la lista de libros,
-    adicionalmente lo guarda en un Map usando como llave su Id.
-    Finalmente crea una entrada en el Map de años, para indicar que este
-    libro fue publicaco en ese año.
-    """
     lt.addLast(catalog['movies'], movie)
     mp.put(catalog['moviesIds'], movie['id'], movie)
     
+def addCasting(catalog, movie):
+    lt.addLast(catalog['casting'], movie)
+    mp.put(catalog['moviesIdsCasting'], movie['id'], movie)
 
-def addComp(catalog, company_name, movie):
+def addMovieByCompany(catalog, companyName, movie):
     """
     Esta funcion adiciona un libro a la lista de libros que
     fueron publicados en un año especifico.
