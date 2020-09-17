@@ -41,27 +41,68 @@ def initCatalog():
     catalog = model.newCatalog()
     return catalog
 
-
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
 
-def loadData(catalog, booksfile, tagsfile, booktagsfile):
+def loadData(catalog1, moviesfile, castingfile):
     """
     Carga los datos de los archivos en el modelo
     """
-    loadBooks(catalog, booksfile)
-    loadTags(catalog, tagsfile)
-    loadBooksTags(catalog, booktagsfile)
+    loadmovies(catalog1, moviesfile)
+    loadmoviesCasting(catalog1, castingfile)
+    
+def loadmoviesCasting(catalog,castingfile):
+    castingfile = cf.data_dir + castingfile
+    dialect = csv.excel()
+    dialect.delimiter=";"
+    input_file= csv.DictReader(open(castingfile, encoding='utf-8-sig'),dialect=dialect)
+    for movie in input_file:
+        model.addCasting(catalog,movie)
+        if(movie['actor1_name']!="none"):
+            model.addMovieByActor(catalog, movie['actor1_name'], movie)
+        if(movie['actor2_name']!="none"):
+            model.addMovieByActor(catalog, movie['actor2_name'], movie)
+        if(movie['actor3_name']!="none"):
+            model.addMovieByActor(catalog, movie['actor3_name'], movie)
+        if(movie['actor4_name']!="none"):
+            model.addMovieByActor(catalog, movie['actor4_name'], movie)
+        if(movie['actor5_name']!="none"):
+            model.addMovieByActor(catalog, movie['actor5_name'], movie)
+        model.addMovieByDirector(catalog, movie['director_name'] , movie)
 
+def loadmovies(catalog, moviesfile):
+    #Carga cada una de las lineas del archivo de libros.
+    #- Se agrega cada pelcula al catalogo de peliculas
+    # - Por cada libro se encuentran sus autores y por cada
+    #  autor, se crea una lista con sus libros
+
+    moviesfile = cf.data_dir + moviesfile
+    sep=";"  
+    dialect = csv.excel()
+    dialect.delimiter=sep
+    
+    with open(moviesfile, encoding="utf-8") as csvfile:
+        input_file = csv.DictReader(csvfile, dialect=dialect)
+        for movie in input_file:
+            model.addmovie(catalog, movie)
+            companias = movie['production_companies'].split(",") #info compañias
+            genres = movie['genres'].split("|")
+            countries = movie['production_countries'].split(",")
+            for compania in companias:
+                model.addMovieByCompany(catalog,compania,movie)
+            for genre in genres:
+                model.addMovieByGenre(catalog, genre.strip(), movie)
+            for country in countries:
+                model.addMovieByCountry(catalog, country.strip(), movie)
 
 def loadBooks(catalog, booksfile):
     """
-    Carga cada una de las lineas del archivo de libros.
-    - Se agrega cada libro al catalogo de libros
-    - Por cada libro se encuentran sus autores y por cada
-      autor, se crea una lista con sus libros
+    #Carga cada una de las lineas del archivo de libros.
+    #- Se agrega cada libro al catalogo de libros
+    #- Por cada libro se encuentran sus autores y por cada
+    #  autor, se crea una lista con sus libros
     """
     booksfile = cf.data_dir + booksfile
     input_file = csv.DictReader(open(booksfile))
@@ -71,29 +112,26 @@ def loadBooks(catalog, booksfile):
         for author in authors:
             model.addBookAuthor(catalog, author.strip(), book)
 
-
 def loadTags(catalog, tagsfile):
     """
-    Carga en el catalogo los tags a partir de la informacion
-    del archivo de etiquetas
+    #Carga en el catalogo los tags a partir de la informacion
+    #del archivo de etiquetas
     """
     tagsfile = cf.data_dir + tagsfile
     input_file = csv.DictReader(open(tagsfile))
     for tag in input_file:
         model.addTag(catalog, tag)
 
-
 def loadBooksTags(catalog, booktagsfile):
     """
-    Carga la información que asocia tags con libros.
-    Primero se localiza el tag y se le agrega la información leida.
-    Adicionalmente se le agrega una referencia al libro procesado.
+    #Carga la información que asocia tags con libros.
+    #Primero se localiza el tag y se le agrega la información leida.
+    #Adicionalmente se le agrega una referencia al libro procesado.
     """
     booktagsfile = cf.data_dir + booktagsfile
     input_file = csv.DictReader(open(booktagsfile))
     for tag in input_file:
         model.addBookTag(catalog, tag)
-
 
 # ___________________________________________________
 #  Funciones para consultas
@@ -104,18 +142,15 @@ def booksSize(catalog):
     """
     return model.booksSize(catalog)
 
-
 def authorsSize(catalog):
     """Numero de autores leido
     """
     return model.authorsSize(catalog)
 
-
 def tagsSize(catalog):
     """Numero de tags leido
     """
     return model.tagsSize(catalog)
-
 
 def getBooksByAuthor(catalog, authorname):
     """
@@ -124,7 +159,6 @@ def getBooksByAuthor(catalog, authorname):
     authorinfo = model.getBooksByAuthor(catalog, authorname)
     return authorinfo
 
-
 def getBooksByTag(catalog, tagname):
     """
     Retorna los libros que han sido marcados con
@@ -132,7 +166,6 @@ def getBooksByTag(catalog, tagname):
     """
     books = model.getBooksByTag(catalog, tagname)
     return books
-
 
 def getBooksYear(catalog, year):
     """
@@ -146,47 +179,8 @@ def getBooksYear(catalog, year):
 #  Inicializacion del catalogo
 # ___________________________________________________
 
-
-def initCatalog():
-    """
-    Llama la funcion de inicializacion del catalogo del modelo.
-    """
-    # catalog es utilizado para interactuar con el modelo
-    catalog = model.newCatalog()
-    
-    return catalog
-
-def loadData(catalog,moviesfile):
-    """
-    Carga los datos de los archivos en el modelo
-    """
-    loadmovies(catalog, moviesfile)
-    
-
-def loadmovies(catalog, moviesfile):
-    """
-    Carga cada una de las lineas del archivo de libros.
-    - Se agrega cada pelcula al catalogo de peliculas
-    - Por cada libro se encuentran sus autores y por cada
-      autor, se crea una lista con sus libros
-    """
-    moviesfile = cf.data_dir + moviesfile
-    sep=";"  
-    dialect = csv.excel()
-    dialect.delimiter=sep
-    
-    with open(moviesfile, encoding="utf-8") as csvfile:
-        input_file = csv.DictReader(csvfile, dialect=dialect)
-        for movie in input_file:
-            model.addmovie(catalog, movie)
-            compas = movie['production_companies'].split(",")  # Se obtienen los autores
-            for compa in compas:
-                model.addComp(catalog, compa.strip(), movie)
-
-            
-
 def getmoviesbycomp (catalog, company_name):
-    compinfo = model.getmoviesbycomp(catalog, company_name)
+    compinfo = model.getMoviesByCompany(catalog, company_name)
     return compinfo
 
 def moviesSize(catalog):

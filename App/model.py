@@ -36,34 +36,30 @@ es decir contiene los modelos con los datos en memoria
 # -----------------------------------------------------
 
 def newCatalog():
-    """ Inicializa el catálogo de libros
-
-    Crea una lista vacia para guardar todos los libros
-
-    Se crean indices (Maps) por los siguientes criterios:
-    Autores
-    ID libros
-    Tags
-    Año de publicacion
-
-    Retorna el catalogo inicializado.
-    """
     catalog = {'movies': None,
+                'casting':None,
+                'moviesIdsCasting':None,
                'moviesIds': None,
                'actors': None,
-                'directors': None,
+               'directors': None,
                'moviesComp': None,
                'genres': None,
-                'countries': None}
+               'countries': None}
     lfactor=0.4
     tamaño=2011
     catalog['movies'] = lt.newList('SINGLE_LINKED', comparaIds)
-    catalog['moviesIds'] = mp.newMap(tamaño,
+    catalog['casting'] = lt.newList('SINGLE_LINKED', comparaIds)
+    catalog['moviesIdsCasting'] = mp.newMap(4011,
+                                   maptype='PROBING',
+                                   loadfactor=lfactor,
+                                   comparefunction=comparaMapMoviesIds
+                                   )
+    catalog['moviesIds'] = mp.newMap(4011,
                                    maptype='PROBING',
                                    loadfactor=lfactor,
                                    comparefunction=comparaMapMoviesIds)
     catalog['moviesComp'] = mp.newMap(tamaño,
-                                   maptype='PROBING',
+                                   maptype='CHAINING',
                                    loadfactor=lfactor,
                                    comparefunction=compareComp)
     catalog['directors'] = mp.newMap(tamaño,
@@ -89,7 +85,7 @@ def newCatalog():
 # ___________________________________________________
 def addmovie(catalog, movie):
     lt.addLast(catalog['movies'], movie)
-    mp.put(catalog['moviesIds'], movie['id'], movie)
+    mp.put(catalog['moviesIds'], movie['id'] , movie)
     
 def addCasting(catalog, movie):
     lt.addLast(catalog['casting'], movie)
@@ -103,40 +99,123 @@ def addMovieByCompany(catalog, companyName, movie):
     y el valor la lista de libros de ese año.
     """
     companias = catalog['moviesComp']
-    existcomp = mp.contains(companias, company_name)
+    existcomp = mp.contains(companias, companyName)
+    comp=None
     if existcomp:
-        entry = mp.get(companias, company_name)
+        entry = mp.get(companias, companyName)
         comp = me.getValue(entry)
     else:
-        comp = newCompania(company_name)
-        mp.put(companias, company_name, comp)
+        comp = {'name':companyName, "movies": lt.newList('SINGLE_LINKED', compareComp),'votes':0.0 ,'vote_average': 0.0, 'vote_count': 0}
+        mp.put(companias, companyName, comp)
     lt.addLast(comp['movies'], movie)
+    comp['votes']+= float(movie['vote_average'])
+    comp['vote_average']=comp['votes']/float(comp['movies']['size'])
+    comp['vote_count']+=int(movie['vote_count'])
 
-    compaverage = comp['vote_average']
-    movieaverage = movie['vote_average']
-    if (compaverage == 0.0):
-        comp['vote_average'] = float(movieaverage)
+def addMovieByDirector(catalog,directorName,movie):
+    directores = catalog['directors']
+    existedirector = mp.contains(directores,directorName)
+    director = None
+    if existedirector:
+        entry = mp.get(directores, directorName)
+        director = me.getValue(entry)
     else:
-        comp['vote_average'] = (compaverage + float(movieaverage)) / 2
+        director = {'name': directorName, 'movies': lt.newList('ARRAY_LIST', compareDirectorsByName),'votes':0.0 ,'vote_average': 0.0, 'vote_count': 0}
+        mp.put(directores, directorName, director)
+    lt.addLast(director['movies'], movie)
+    kv1=mp.get(catalog['moviesIds'],movie['id'])
+    movieavg = me.getValue(kv1)['vote_average']
+    moviecount = me.getValue(kv1)['vote_count']
+    director['votes']+=float(movieavg)
+    director['vote_average']=director['votes']/float(director['movies']['size'])
+    director['vote_count']+=int(moviecount)
 
+def addMovieByCountry(catalog,countryName,movie):
+    countries = catalog['countries']
+    existcountry = mp.contains(countries,countryName)
+    country=None
+    if existcountry:
+        entry = mp.get(countries, countryName)
+        country = me.getValue(entry)
+    else:
+        country = {'name': countryName, 'movies': lt.newList('ARRAY_LIST', compareCountry),'votes':0.0 , 'vote_average': 0.0, 'vote_count': 0}
+        mp.put(countries, countryName, country)
+    lt.addLast(country['movies'], movie)
+    country['votes']+=float(movie['vote_average'])
+    country['vote_average']=country['votes']/float(country['movies']['size'])
+    country['vote_count']+=int(movie['vote_count'])
+    
+def addMovieByGenre(catalog,genreName,movie):
+    genres = catalog['genres']
+    existgenre = mp.contains(genres,genreName)
+    genre=None
+    if existgenre:
+        entry = mp.get(genres, genreName)
+        genre = me.getValue(entry)
+    else:
+        genre = {'name': genreName, 'movies': lt.newList('ARRAY_LIST', compareGenres),'votes':0.0 , 'vote_average': 0.0, 'vote_count': 0}
+        mp.put(genres, genreName, genre)
+    lt.addLast(genre['movies'], movie)
+    genre['votes']+=float(movie['vote_average'])
+    genre['vote_average']=genre['votes']/float(genre['movies']['size'])
+    genre['vote_count']+=int(movie['vote_count'])
 
-def newCompania(company_product):
-    """
-    Esta funcion crea la estructura de libros asociados
-    a un año.
-    """
-    entry = {'comp': "", "movies": None, "vote_average": 0}
-    entry['comp'] = company_product
-    entry['movies'] = lt.newList('SINGLE_LINKED', compareComp)
-    return entry
+def addMovieByActor(catalog,actorName,movie):
+    actors = catalog['actors']
+    existactor = mp.contains(actors,actorName)
+    actor=None
+    if existactor:
+        entry = mp.get(actors, actorName)
+        actor = me.getValue(entry)
+    else:
+        actor = {'name': actorName, 'movies': lt.newList('ARRAY_LIST', compareActorsByName),'directors':lt.newList('ARRAY_LIST', compareDirectorsByName), 'votes':0.0 , 'vote_average': 0.0, 'vote_count': 0}
+        mp.put(actors, actorName, actor)
+    lt.addLast(actor['movies'], movie)
+    kv1=mp.get(catalog['moviesIds'],movie['id'])
+    movieavg = me.getValue(kv1)['vote_average']
+    moviecount = me.getValue(kv1)['vote_count']
+    actor['votes']+=float(movieavg)
+    actor['vote_average']=actor['votes']/float(actor['movies']['size'])
+    actor['vote_count']+=int(moviecount)
 
-def getmoviesbycomp(catalog, company_name):
-    """
-    Retorna un autor con sus libros a partir del nombre del autor
-    """
-    company_name = mp.get(catalog['moviesComp'], company_name)
-    if company_name:
-        return me.getValue(company_name)
+    """director = actor['directors']
+    namedic = str(movie['director_name'])
+    if director['size']==0 or director== None:
+        lt.addFirst(director,{'name':namedic, 'veces':1})
+    else:
+        if existe(director,'name', namedic):
+            for dir in director:
+                if str(dir['name']) == namedic:
+                    dir['veces']+=1
+                    break
+        else:
+            lt.addLast(director,{'name':namedic, 'veces':1})"""
+
+# ___________________________________________________
+#  Funciones para la comparacion y obtencion
+#  de datos en los modelos
+# ___________________________________________________   
+def existe(lst, column, criteria ):
+    for i in  range(lst['size']):
+        element = lt.getElement(lst, i)
+        if(element[column] == criteria):
+            return True
+            break
+        else:
+            return False
+
+def getMoviesByCompany(catalog, companyName):
+   
+    companyName = mp.get(catalog['moviesComp'], companyName)
+    if companyName:
+        return me.getValue(companyName)
+    return None
+
+def getMoviesByDirector(catalog, directorName):
+   
+    directorName = mp.get(catalog['directors'], directorName)
+    if directorName:
+        return me.getValue(directorName)
     return None
 
 def comparaIds (id, record):
@@ -148,10 +227,7 @@ def comparaIds (id, record):
     return -1
 
 def comparaMapMoviesIds(id, entry):
-    """
-    Compara dos ids de libros, id es un identificador
-    y entry una pareja llave-valor
-    """
+    
     identry = me.getKey(entry)
     if (int(id) == int(identry)):
         return 0
@@ -169,12 +245,6 @@ def compareComp(Comp, entry):
     else:
         return -1
 
-def moviesSize(catalog):
-    """
-    Número de libros en el catago
-    """
-    return lt.size(catalog['movies'])
-
 def compareDirectorsByName(director, entry):
     directorentry = me.getKey(entry)
     if (director == directorentry):
@@ -183,6 +253,7 @@ def compareDirectorsByName(director, entry):
         return 1
     else:
         return -1
+
 def compareActorsByName(name, entry):
     nameentry = me.getKey(entry)
     if (name == nameentry):
@@ -191,6 +262,7 @@ def compareActorsByName(name, entry):
         return 1
     else:
         return -1
+
 def compareGenres(genre, entry):
     genreentry = me.getKey(entry)
     if (genre == genreentry):
@@ -208,3 +280,6 @@ def compareCountry(country, entry):
         return 1
     else:
         return 0 
+
+def moviesSize(catalog):
+    return lt.size(catalog['movies'])

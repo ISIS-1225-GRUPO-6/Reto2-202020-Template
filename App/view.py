@@ -33,16 +33,12 @@ Presenta el menu de opciones y por cada seleccion
 hace la solicitud al controlador para ejecutar la
 operación seleccionada.
 """
-moviesfile = 'SmallMoviesDetailsCleaned.csv'
-castingfile = 'MoviesCastingRaw-small.csv'
 
 # ___________________________________________________
 #  Ruta a los archivos
 # ___________________________________________________
-
-
-
-
+moviesfile = 'SmallMoviesDetailsCleaned.csv'
+castingfile = 'MoviesCastingRaw-small.csv'
 # ___________________________________________________
 #  Funciones para imprimir la inforamación de
 #  respuesta.  La vista solo interactua con
@@ -50,8 +46,9 @@ castingfile = 'MoviesCastingRaw-small.csv'
 # ___________________________________________________
 def imprime_companias(compa_info):
     if compa_info:
-        print('Compañia encontrada: ' + compa_info['comp'])
+        print('Compañia encontrada: ' + compa_info['name'])
         print('Promedio: ' + str(compa_info['vote_average']))
+        print('Total de votos: ' + str(compa_info['vote_count']))
         print('Total de peliculas: ' + str(lt.size(compa_info['movies'])))
         iterator = it.newIterator(compa_info['movies'])
         while it.hasNext(iterator):
@@ -68,42 +65,47 @@ def printMenu():
     print("0- Salir")
 
 
-"""
-Menu principal
-"""
-while True:
-    printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
-
-    if int(inputs[0]) == 1:
-        print("Inicializando Catálogo ....")
-        # cont es el controlador que se usará de acá en adelante
-        cont = controller.initCatalog()
-
-    elif int(inputs[0]) == 2:
-        print("Cargando información de los archivos ....")
-        controller.loadData(cont, moviesfile)
-        print('Peliculas cargadas: '+str(controller.moviesSize(cont)))
+# ___________________________________________________
+#  Menu principal
+# ___________________________________________________
+def main():
+    catalogo1=None
+    
+    while True:
+        printMenu()
         
-    elif int(inputs[0]) == 3:
-        company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
-        compa_info = controller.getmoviesbycomp(cont, company_name)
-        imprime_companias(compa_info)
+        inputs = input('Seleccione una opción para continuar\n')
 
-    elif int(inputs[0]) == 4:
-        print()
-
-    elif int(inputs[0]) == 5:
-        print()
-                    
-    elif int(inputs[0]) == 6:
-        print()
-                
-    elif int(inputs[0]) == 7:
-        print()
+        if int(inputs[0]) == 1:
+            print("Inicializando Catálogo ....")
+            catalogo1 = controller.initCatalog()
             
-    elif int(inputs[0]) == 8:
-        print()
-    else:
-        sys.exit(0)
-sys.exit(0)
+
+        elif int(inputs[0]) == 2:
+            print("Cargando información de los archivos ....")
+            controller.loadData(catalogo1, moviesfile, castingfile)
+            print('Peliculas cargadas: '+str(controller.moviesSize(catalogo1))+"  , y casting: " +str(controller.moviesSize(catalogo1)))
+            
+        elif int(inputs[0]) == 3:
+            company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
+            compa_info = controller.getmoviesbycomp(catalogo1, company_name)
+            imprime_companias(compa_info)
+
+        elif int(inputs[0]) == 4:
+            print()
+
+        elif int(inputs[0]) == 5:
+            print()
+                        
+        elif int(inputs[0]) == 6:
+            print()
+                    
+        elif int(inputs[0]) == 7:
+            print()
+                
+        elif int(inputs[0]) == 8:
+            print()
+        else:
+            sys.exit(0)
+    sys.exit(0)
+main()
