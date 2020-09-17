@@ -27,7 +27,6 @@ from DISClib.DataStructures import listiterator as it
 from App import controller
 assert config
 import csv
-from ADT import list as lt
 
 
 """
