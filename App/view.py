@@ -135,7 +135,6 @@ def printMenu():
     print("7- Películas que se produjeron por un actor")
     print("0- Salir")
 
-
 # ___________________________________________________
 #  Menu principal
 # ___________________________________________________
