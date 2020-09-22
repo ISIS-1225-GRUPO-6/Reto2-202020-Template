@@ -122,8 +122,9 @@ def addMovieByDirector(catalog,directorName,movie):
     else:
         director = {'name': directorName, 'movies': lt.newList('ARRAY_LIST', compareDirectorsByName),'votes':0.0 ,'vote_average': 0.0, 'vote_count': 0}
         mp.put(directores, directorName, director)
-    lt.addLast(director['movies'], movie)
     kv1=mp.get(catalog['moviesIds'],movie['id'])
+    movie1= me.getValue(kv1)
+    lt.addLast(director['movies'], movie1)
     movieavg = me.getValue(kv1)['vote_average']
     moviecount = me.getValue(kv1)['vote_count']
     director['votes']+=float(movieavg)
@@ -168,28 +169,30 @@ def addMovieByActor(catalog,actorName,movie):
         entry = mp.get(actors, actorName)
         actor = me.getValue(entry)
     else:
-        actor = {'name': actorName, 'movies': lt.newList('ARRAY_LIST', compareActorsByName),'directors':lt.newList('ARRAY_LIST', compareDirectorsByName), 'votes':0.0 , 'vote_average': 0.0, 'vote_count': 0}
+        actor = {'name': actorName, 'movies': lt.newList('ARRAY_LIST', compareActorsByName), 'directors' :lt.newList('ARRAY_LIST', compareDirectorsByName), 'votes':0.0 , 'vote_average': 0.0, 'vote_count': 0}
         mp.put(actors, actorName, actor)
-    lt.addLast(actor['movies'], movie)
     kv1=mp.get(catalog['moviesIds'],movie['id'])
+    movie1= me.getValue(kv1)
+    lt.addLast(actor['movies'], movie1)
     movieavg = me.getValue(kv1)['vote_average']
     moviecount = me.getValue(kv1)['vote_count']
     actor['votes']+=float(movieavg)
     actor['vote_average']=actor['votes']/float(actor['movies']['size'])
     actor['vote_count']+=int(moviecount)
-
-    """director = actor['directors']
-    namedic = str(movie['director_name'])
+    director = actor['directors']
+    namedic = movie['director_name']
     if director['size']==0 or director== None:
         lt.addFirst(director,{'name':namedic, 'veces':1})
     else:
         if existe(director,'name', namedic):
-            for dir in director:
-                if str(dir['name']) == namedic:
-                    dir['veces']+=1
+            for i in  range(director['size']):
+                element = lt.getElement(director, i)
+                if(element['name'] == namedic):
+                    element['veces']+=1
                     break
+
         else:
-            lt.addLast(director,{'name':namedic, 'veces':1})"""
+            lt.addLast(director,{'name':namedic, 'veces':1})
 
 # ___________________________________________________
 #  Funciones para la comparacion y obtencion
@@ -205,17 +208,33 @@ def existe(lst, column, criteria ):
             return False
 
 def getMoviesByCompany(catalog, companyName):
-   
     companyName = mp.get(catalog['moviesComp'], companyName)
     if companyName:
         return me.getValue(companyName)
     return None
 
 def getMoviesByDirector(catalog, directorName):
-   
     directorName = mp.get(catalog['directors'], directorName)
     if directorName:
         return me.getValue(directorName)
+    return None
+
+def getMoviesByCountry(catalog, country):
+    country = mp.get(catalog['countries'], country)
+    if country:
+        return me.getValue(country)
+    return None
+
+def getMoviesByGenre(catalog, genre):
+    genre = mp.get(catalog['genres'], genre)
+    if genre:
+        return me.getValue(genre)
+    return None
+
+def getMoviesByActor(catalog, actorName):
+    actorName = mp.get(catalog['actors'], actorName)
+    if actorName:
+        return me.getValue(actorName)
     return None
 
 def comparaIds (id, record):

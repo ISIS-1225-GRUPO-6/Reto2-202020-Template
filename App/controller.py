@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  """
 
+from App.model import getMoviesByCountry, getMoviesByGenre
 import config as cf
 from App import model
 import csv
@@ -32,14 +33,6 @@ el modelo varias veces o integrar varias de las respuestas
 del modelo en una sola respuesta. Esta responsabilidad
 recae sobre el controlador.
 """
-
-def initCatalog():
-    """
-    Llama la funcion de inicializacion del catalogo del modelo.
-    """
-    # catalog es utilizado para interactuar con el modelo
-    catalog = model.newCatalog()
-    return catalog
 
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
@@ -97,93 +90,43 @@ def loadmovies(catalog, moviesfile):
             for country in countries:
                 model.addMovieByCountry(catalog, country.strip(), movie)
 
-def loadBooks(catalog, booksfile):
-    """
-    #Carga cada una de las lineas del archivo de libros.
-    #- Se agrega cada libro al catalogo de libros
-    #- Por cada libro se encuentran sus autores y por cada
-    #  autor, se crea una lista con sus libros
-    """
-    booksfile = cf.data_dir + booksfile
-    input_file = csv.DictReader(open(booksfile))
-    for book in input_file:
-        model.addBook(catalog, book)
-        authors = book['authors'].split(",")  # Se obtienen los autores
-        for author in authors:
-            model.addBookAuthor(catalog, author.strip(), book)
-
-def loadTags(catalog, tagsfile):
-    """
-    #Carga en el catalogo los tags a partir de la informacion
-    #del archivo de etiquetas
-    """
-    tagsfile = cf.data_dir + tagsfile
-    input_file = csv.DictReader(open(tagsfile))
-    for tag in input_file:
-        model.addTag(catalog, tag)
-
-def loadBooksTags(catalog, booktagsfile):
-    """
-    #Carga la información que asocia tags con libros.
-    #Primero se localiza el tag y se le agrega la información leida.
-    #Adicionalmente se le agrega una referencia al libro procesado.
-    """
-    booktagsfile = cf.data_dir + booktagsfile
-    input_file = csv.DictReader(open(booktagsfile))
-    for tag in input_file:
-        model.addBookTag(catalog, tag)
 
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+def getMoviesByCompany (catalog, companyName):
+    companyInfo = model.getMoviesByCompany(catalog, companyName)
+    return companyInfo
 
-def booksSize(catalog):
-    """Numero de libros leido
-    """
-    return model.booksSize(catalog)
+def getMoviesByActor (catalog, actorName):
+    actorInfo = model.getMoviesByActor(catalog, actorName)
+    return actorInfo
 
-def authorsSize(catalog):
-    """Numero de autores leido
-    """
-    return model.authorsSize(catalog)
+def getMoviesByDirector (catalog, directorName):
+    directorInfo = model.getMoviesByDirector(catalog, directorName)
+    return directorInfo
 
-def tagsSize(catalog):
-    """Numero de tags leido
-    """
-    return model.tagsSize(catalog)
+def getMoviesByCountry (catalog, country):
+    countryInfo = model.getMoviesByCountry(catalog, country)
+    return countryInfo
 
-def getBooksByAuthor(catalog, authorname):
-    """
-    Retorna los libros de un autor
-    """
-    authorinfo = model.getBooksByAuthor(catalog, authorname)
-    return authorinfo
-
-def getBooksByTag(catalog, tagname):
-    """
-    Retorna los libros que han sido marcados con
-    una etiqueta
-    """
-    books = model.getBooksByTag(catalog, tagname)
-    return books
-
-def getBooksYear(catalog, year):
-    """
-    Retorna los libros que fueron publicados
-    en un año
-    """
-    books = model.getBooksByYear(catalog, year)
-    return books
-
-# ___________________________________________________
-#  Inicializacion del catalogo
-# ___________________________________________________
-
-def getmoviesbycomp (catalog, company_name):
-    compinfo = model.getMoviesByCompany(catalog, company_name)
-    return compinfo
+def getMoviesByGenre (catalog, genre):
+    genreInfo = model.getMoviesByGenre(catalog, genre)
+    return genreInfo
 
 def moviesSize(catalog):
     """Numero de libros leido
     """
     return model.moviesSize(catalog)
+
+
+# ___________________________________________________
+#  Inicializacion del catalogo
+# ___________________________________________________
+def initCatalog():
+    """
+    Llama la funcion de inicializacion del catalogo del modelo.
+    """
+    # catalog es utilizado para interactuar con el modelo
+    catalog = model.newCatalog()
+    return catalog

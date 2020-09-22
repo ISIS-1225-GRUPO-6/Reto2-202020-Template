@@ -44,24 +44,95 @@ castingfile = 'MoviesCastingRaw-small.csv'
 #  respuesta.  La vista solo interactua con
 #  el controlador.
 # ___________________________________________________
-def imprime_companias(compa_info):
-    if compa_info:
-        print('Compañia encontrada: ' + compa_info['name'])
-        print('Promedio: ' + str(compa_info['vote_average']))
-        print('Total de votos: ' + str(compa_info['vote_count']))
-        print('Total de peliculas: ' + str(lt.size(compa_info['movies'])))
-        iterator = it.newIterator(compa_info['movies'])
+def printCompany(catalogo1, companyName):
+    info = controller.getMoviesByCompany(catalogo1, companyName)
+    if info:
+        print('Compañia encontrada: ' + info['name'])
+        print('Promedio: ' + str(info['vote_average']))
+        print('Total de votos: ' + str(info['vote_count']))
+        print('Total de peliculas: ' + str(lt.size(info['movies'])))
+        iterator = it.newIterator(info['movies'])
         while it.hasNext(iterator):
             movie = it.next(iterator)
             print(movie['original_title'])
     else:
         print('No se encontro la compañia')
 
+def printCountry(catalogo1, countryName):
+    info = controller.getMoviesByCountry(catalogo1, countryName)
+    if info:
+        print('pais encontrado: ' + info['name'])
+        print('Promedio: ' + str(info['vote_average']))
+        print('Total de votos: ' + str(info['vote_count']))
+        print('Total de peliculas: ' + str(lt.size(info['movies'])))
+        iterator = it.newIterator(info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+    else:
+        print('No se encontro el pais')
+
+def printGenre(catalogo1, genreName):
+    info = controller.getMoviesByGenre(catalogo1, genreName)
+    if info:
+        print('genero encontrado encontrado: ' + info['name'])
+        print('Promedio: ' + str(info['vote_average']))
+        print('Total de votos: ' + str(info['vote_count']))
+        print('Total de peliculas: ' + str(lt.size(info['movies'])))
+        iterator = it.newIterator(info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+    else:
+        print('No se encontro el genero')
+
+def printDirector(catalogo1, directorName):
+    info = controller.getMoviesByDirector(catalogo1, directorName)
+    if info:
+        print('director encontrado: ' + info['name'])
+        print('Promedio: ' + str(info['vote_average']))
+        print('Total de votos: ' + str(info['vote_count']))
+        print('Total de peliculas: ' + str(lt.size(info['movies'])))
+        iterator = it.newIterator(info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+    else:
+        print('No se encontro el director')
+
+def printActor(catalogo1, actorName):
+    info = controller.getMoviesByActor(catalogo1, actorName)
+    if info:
+        print('actor encontrado: ' + info['name'])
+        print('Promedio: ' + str(info['vote_average']))
+        print('Total de votos: ' + str(info['vote_count']))
+        print('Total de peliculas: ' + str(lt.size(info['movies'])))
+        iterator = it.newIterator(info['movies'])
+        while it.hasNext(iterator):
+            movie = it.next(iterator)
+            print(movie['original_title'])
+        mayor=0
+        quien=""
+        for i in range (info['directors']['size']):
+            element = lt.getElement(info['directors'], i)
+            if int(element['veces'])> mayor:
+                mayor=int(element['veces'])
+                quien=element['name']
+        print('director con mas colaboraciones: ' + quien)
+
+
+    else:
+        print('No se encontro el pais')
+
 def printMenu():
     print("Bienvenido")
     print("1- Inicializar Catálogo")
     print("2- Cargar información en el catálogo")
     print("3- Películas que pertenecen a una compañía de producción")
+    print("4- Películas que se produjeron en un pais")
+    print("5- Películas que se produjeron con un genero")
+    print("6- Películas que se produjeron por un director")
+    print("7- Películas que se produjeron por un actor")
     print("0- Salir")
 
 
@@ -78,8 +149,7 @@ def main():
 
         if int(inputs[0]) == 1:
             print("Inicializando Catálogo ....")
-            catalogo1 = controller.initCatalog()
-            
+            catalogo1 = controller.initCatalog()      
 
         elif int(inputs[0]) == 2:
             print("Cargando información de los archivos ....")
@@ -87,24 +157,25 @@ def main():
             print('Peliculas cargadas: '+str(controller.moviesSize(catalogo1))+"  , y casting: " +str(controller.moviesSize(catalogo1)))
             
         elif int(inputs[0]) == 3:
-            company_name = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
-            compa_info = controller.getmoviesbycomp(catalogo1, company_name)
-            imprime_companias(compa_info)
+            companyName = str(input('Escriba el nombre de la compañia de producción que desea consultar: '))
+            printCompany(catalogo1, companyName)
 
         elif int(inputs[0]) == 4:
-            print()
+            countryName = str(input('Escriba el nombre del pais que desea consultar: '))
+            printCountry(catalogo1, countryName)
 
         elif int(inputs[0]) == 5:
-            print()
-                        
+            genreName = str(input('Escriba el nombre del genero que desea consultar: '))
+            printGenre(catalogo1, genreName)
+                           
         elif int(inputs[0]) == 6:
-            print()
+            directorName = str(input('Escriba el nombre del director que desea consultar: '))
+            printDirector(catalogo1, directorName)
                     
         elif int(inputs[0]) == 7:
-            print()
-                
-        elif int(inputs[0]) == 8:
-            print()
+            actorName = str(input('Escriba el nombre del actor que desea consultar: '))
+            printActor(catalogo1, actorName)
+
         else:
             sys.exit(0)
     sys.exit(0)
