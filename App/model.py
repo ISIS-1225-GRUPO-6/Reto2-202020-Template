@@ -36,7 +36,6 @@ es decir contiene los modelos con los datos en memoria
 # -----------------------------------------------------
 
 def newCatalog():
-    "init"
     catalog = {'movies': None,
                 'casting':None,
                 'moviesIdsCasting':None,

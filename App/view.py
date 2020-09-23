@@ -122,7 +122,7 @@ def printActor(catalogo1, actorName):
 
 
     else:
-        print('No se encontro el pais')
+        print('No se encontro el actor')
 
 def printMenu():
     print("Bienvenido")
